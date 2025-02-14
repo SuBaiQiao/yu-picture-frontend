@@ -17,10 +17,22 @@
           :items="items"
         />
       </a-col>
+
+      <!--      用户信息展示栏-->
       <a-col flex="120px">
         <div class="user-login-status">
           <div v-if="loginUserStore.loginUser.id">
-            {{ loginUserStore.loginUser.userName ?? '无名' }}
+            <a-dropdown>
+              <a-space>
+                <a-avatar :src="loginUserStore.loginUser.userAvatar"></a-avatar>
+                {{ loginUserStore.loginUser.userName ?? '无名' }}
+              </a-space>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item @click="doLogout"> <LoginOutlined /> 退出登录 </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
           </div>
           <div v-else>
             <a-button type="primary" href="/user/login">登录</a-button>
@@ -32,10 +44,11 @@
 </template>
 <script lang="ts" setup>
 import { h, ref, onBeforeMount } from 'vue'
-import { HomeOutlined } from '@ant-design/icons-vue'
-import { MenuProps } from 'ant-design-vue'
+import { HomeOutlined, LoginOutlined } from '@ant-design/icons-vue'
+import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import { userLogoutUsingPost } from '@/api/userController.ts'
 const loginUserStore = useLoginUserStore()
 const current = ref<string[]>(['/'])
 const items = ref<MenuProps['items']>([
@@ -58,10 +71,26 @@ const items = ref<MenuProps['items']>([
 ])
 const router = useRouter()
 
-const doMenuClick = ({ key }) => {
+const doMenuClick = ({ key }: any) => {
   router.push({
     path: key,
   })
+}
+
+const doLogout = async () => {
+  const res = await userLogoutUsingPost()
+  if (res.data.code === 0) {
+    loginUserStore.setLoginUser({
+      userName: '未登录',
+    })
+    message.success('退出登陆成功！')
+    await router.push({
+      path: '/user/login',
+      replace: true,
+    })
+  } else {
+    message.error('退出登陆失败！' + res.data.message)
+  }
 }
 
 onBeforeMount(() => {
