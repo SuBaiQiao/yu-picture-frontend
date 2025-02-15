@@ -43,7 +43,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { h, ref, onBeforeMount } from 'vue'
+import { h, ref, onBeforeMount, computed } from 'vue'
 import { HomeOutlined, LoginOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -51,7 +51,7 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { userLogoutUsingPost } from '@/api/userController.ts'
 const loginUserStore = useLoginUserStore()
 const current = ref<string[]>(['/'])
-const items = ref<MenuProps['items']>([
+const originItems = ref<MenuProps['items']>([
   {
     key: '/',
     icon: () => h(HomeOutlined),
@@ -69,6 +69,29 @@ const items = ref<MenuProps['items']>([
     title: '百度',
   },
 ])
+
+/**
+ * 菜单过滤器
+ * @param menus
+ */
+const filterMenus = (menus = [] as MenuProps['items']) => {
+  return menus?.filter((menu) => {
+    if (menu?.key?.startsWith('/admin')) {
+      const loginUser = loginUserStore.loginUser
+      if (!loginUser || loginUser.userRole !== 'admin') {
+        return false
+      }
+    }
+    return true
+  })
+}
+/**
+ * 展示的菜单
+ */
+const items = computed(() => {
+  return filterMenus(originItems.value)
+})
+
 const router = useRouter()
 
 const doMenuClick = ({ key }: any) => {
