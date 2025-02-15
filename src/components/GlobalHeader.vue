@@ -64,6 +64,11 @@ const originItems = ref<MenuProps['items']>([
     title: '用户管理',
   },
   {
+    key: '/add_picture',
+    label: '创建图片',
+    title: '创建图片',
+  },
+  {
     key: 'others',
     label: h('a', { href: 'https://www.baidu.com', target: '_blank' }, '百度'),
     title: '百度',
