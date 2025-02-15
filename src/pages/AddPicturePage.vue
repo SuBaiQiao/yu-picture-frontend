@@ -1,7 +1,7 @@
 <template>
   <div id="AddPicturePage">
     <!--    标题-->
-    <h2 style="margin-bottom: 16px">创建图片</h2>
+    <h2 style="margin-bottom: 16px">{{ route.query?.id ? '修改' : '创建' }}图片</h2>
     <!--    图片上传-->
     <PictureUpload :on-success="onSuccess" :picture="picture"></PictureUpload>
     <!--    图片信息表单-->
@@ -43,7 +43,9 @@
         ></a-select>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
+        <a-button type="primary" html-type="submit" style="width: 100%">{{
+          route.query?.id ? '修改' : '创建'
+        }}</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -53,9 +55,14 @@
 import PictureUpload from '@/components/PictureUpload.vue'
 import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { editPictureUsingPost, listPictureTagCategoryUsingGet } from '@/api/pictureController.ts'
-import { useRouter } from 'vue-router'
+import {
+  editPictureUsingPost,
+  getPictureVoByIdUsingPost,
+  listPictureTagCategoryUsingGet,
+} from '@/api/pictureController.ts'
+import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
+const route = useRoute()
 const picture = ref<API.PictureVO>({})
 const pictureForm = reactive<API.PictureEditRequest>({
   category: '',
@@ -116,12 +123,30 @@ const getCategoryAndTagOptions = async () => {
       }
     })
   } else {
-    message.error('分类失败！' + res.data.message)
+    message.error('获取标签分类列表失败！' + res.data.message)
+  }
+}
+
+const getOldPicture = async () => {
+  const id = route.query?.id
+  if (id) {
+    const res = await getPictureVoByIdUsingPost({
+      id,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      const data = res.data.data
+      picture.value = data
+      pictureForm.name = data.name
+      pictureForm.introduction = data.introduction
+      pictureForm.category = data.category
+      pictureForm.tags = data.tags
+    }
   }
 }
 
 onMounted(() => {
   getCategoryAndTagOptions()
+  getOldPicture()
 })
 </script>
 
