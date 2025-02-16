@@ -66,8 +66,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import {
   listPictureTagCategoryUsingGet,
-  listPictureVoByPageCacheUsingPost,
-  listPictureVoByPageUsingPost,
+  listPictureVoByPageCacheMultiUsingPost,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -110,7 +109,7 @@ const fetchData = async () => {
       params.tags?.push(tagList.value[index])
     }
   })
-  const res = await listPictureVoByPageCacheUsingPost(params)
+  const res = await listPictureVoByPageCacheMultiUsingPost(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0

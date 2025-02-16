@@ -92,12 +92,42 @@ export async function listPictureVoByPageUsingPost(
   })
 }
 
-/** listPictureVOByPageCache POST /api/picture/list/page/vo/cache */
-export async function listPictureVoByPageCacheUsingPost(
+/** listPictureVOByPageCacheCaffeine POST /api/picture/list/page/vo/cache/caffeine */
+export async function listPictureVoByPageCacheCaffeineUsingPost(
   body: API.PictureQueryRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponsePagePictureVO_>('/api/picture/list/page/vo/cache', {
+  return request<API.BaseResponsePagePictureVO_>('/api/picture/list/page/vo/cache/caffeine', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** listPictureVOByPageCacheMulti POST /api/picture/list/page/vo/cache/multi */
+export async function listPictureVoByPageCacheMultiUsingPost(
+  body: API.PictureQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePagePictureVO_>('/api/picture/list/page/vo/cache/multi', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** listPictureVOByPageCacheRedis POST /api/picture/list/page/vo/cache/redis */
+export async function listPictureVoByPageCacheRedisUsingPost(
+  body: API.PictureQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePagePictureVO_>('/api/picture/list/page/vo/cache/redis', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
