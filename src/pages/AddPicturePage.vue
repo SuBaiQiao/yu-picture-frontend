@@ -111,8 +111,8 @@ const handleSubmit = async (values: API.PictureEditRequest) => {
   }
 }
 
-const categoryList = ref<string[]>([])
-const tagOptions = ref<string[]>([])
+const categoryList = ref<{ label: string; value: string }[]>([])
+const tagOptions = ref<{ label: string; value: string }[]>([])
 
 /**
  * 获取标签和分类选项
