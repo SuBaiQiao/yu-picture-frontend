@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver'
  * 格式化文件大小
  * @param size
  */
-const formatSize = (size) => {
+const formatSize = (size: number) => {
   if (!size) return '未知'
   if (size < 1024) {
     return size + 'B'

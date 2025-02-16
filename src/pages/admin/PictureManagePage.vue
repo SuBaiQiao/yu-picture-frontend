@@ -20,6 +20,15 @@
           allow-clear
         />
       </a-form-item>
+      <a-form-item label="审核状态" name="reviewStatus">
+        <a-select
+          v-model:value="searchParam.reviewStatus"
+          placeholder="请输入标签"
+          :options="PIC_REVIEW_STATUS_OPTIONS"
+          allow-clear
+          style="min-width: 180px"
+        ></a-select>
+      </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit">搜索</a-button>
       </a-form-item>
@@ -38,7 +47,7 @@
         </template>
         <template v-else-if="column.dataIndex === 'tags'">
           <a-space wrap>
-            <a-tag v-for="item in record.tags" :key="item">
+            <a-tag v-for="item in JSON.parse(record.tags || '[]')" :key="item">
               {{ item }}
             </a-tag>
           </a-space>
@@ -50,6 +59,20 @@
           <div>宽高比：{{ record.picScale }}</div>
           <div>大小：{{ (record.picSize / 1024).toFixed(2) }} KB</div>
         </template>
+        <template v-if="column.dataIndex === 'reviewMessage'">
+          <div>
+            <span>审核状态：</span>
+            <!--            {{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}-->
+            <a-badge v-if="record.reviewStatus === 0" color="blue" text="审核中" />
+            <a-badge v-if="record.reviewStatus === 1" color="green" text="通过" />
+            <a-badge v-if="record.reviewStatus === 2" color="red" text="拒绝" />
+          </div>
+          <div v-if="record.reviewMessage">审核信息：{{ record.reviewMessage }}</div>
+          <div v-if="record.reviewerId">审核人：{{ record.reviewerId }}</div>
+          <div v-if="record.reviewTime">
+            审核时间：{{ dayjs(record.reviewTime).format('YYYY-MM-DD HH:mm:ss') }}
+          </div>
+        </template>
         <template v-if="column.dataIndex === 'createTime'">
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
@@ -58,6 +81,21 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <a-space wrap>
+            <a-button
+              v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS"
+              type="link"
+              size="small"
+              @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.PASS)"
+              >通过</a-button
+            >
+            <a-button
+              v-if="record.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT"
+              type="link"
+              size="small"
+              danger
+              @click="handleReview(record, PIC_REVIEW_STATUS_ENUM.REJECT)"
+              >拒绝</a-button
+            >
             <a-button
               type="link"
               size="small"
@@ -74,9 +112,18 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { deletePictureUsingPost, listPictureByPageUsingPost } from '@/api/pictureController.ts'
+import {
+  deletePictureUsingPost,
+  doReviewPictureUsingPost,
+  listPictureByPageUsingPost,
+} from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
+import {
+  PIC_REVIEW_STATUS_ENUM,
+  PIC_REVIEW_STATUS_MAP,
+  PIC_REVIEW_STATUS_OPTIONS,
+} from '@/constant/picture.ts'
 const columns = [
   { title: 'id', dataIndex: 'id', width: 80 },
   { title: '图片', dataIndex: 'url', width: 140 },
@@ -86,6 +133,7 @@ const columns = [
   { title: '标签', dataIndex: 'tags' },
   { title: '图片信息', dataIndex: 'picInfo' },
   { title: '用户ID', dataIndex: 'userId', width: 80 },
+  { title: '审核信息', dataIndex: 'reviewMessage' },
   { title: '创建时间', dataIndex: 'createTime' },
   { title: '编辑时间', dataIndex: 'editTime' },
   { title: '操作', key: 'action' },
@@ -149,6 +197,22 @@ const doDelete = async (id: string) => {
     await fetchData()
   } else {
     message.error('删除失败！' + res.data.message)
+  }
+}
+
+const handleReview = async (record: API.PictureVO, reviewStatus: number) => {
+  const reviewMessage =
+    reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作通过' : '管理员操作拒绝'
+  const res = await doReviewPictureUsingPost({
+    id: record.id,
+    reviewStatus,
+    reviewMessage,
+  })
+  if (res.data.code === 0) {
+    message.success('审核操作成功！')
+    await fetchData()
+  } else {
+    message.error('审核操作失败！' + res.data.message)
   }
 }
 
