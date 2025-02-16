@@ -13,7 +13,7 @@
           <a-descriptions :column="1">
             <a-descriptions-item label="作者">
               <a-space>
-                <a-avatar :size="24" :src="picture.user?.avatarUrl" />
+                <a-avatar :size="24" :src="picture.user?.userAvatar" />
                 <div>{{ picture.user?.userName }}</div>
               </a-space>
             </a-descriptions-item>
