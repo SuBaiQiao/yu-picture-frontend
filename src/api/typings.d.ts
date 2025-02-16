@@ -231,7 +231,13 @@ declare namespace API {
     filepath: string
   }
 
+  type uploadPictureByUrlUsingPOSTParams = {
+    fileUrl?: string
+    id?: number
+  }
+
   type uploadPictureUsingPOSTParams = {
+    fileUrl?: string
     id?: number
   }
 
