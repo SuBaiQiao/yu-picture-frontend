@@ -29,36 +29,15 @@
       </a-space>
     </div>
     <!--    图片列表-->
-    <a-list
-      :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 5, xxl: 6 }"
-      :data-source="dataList"
-      :pagination="pagination"
-      :loading="loading"
-    >
-      <template #renderItem="{ item: picture }">
-        <a-list-item style="padding: 0">
-          <a-card hoverable @click="doClickPicture(picture)">
-            <template #cover>
-              <img
-                :alt="picture.name"
-                :src="picture.thumbnailUrl || picture.url"
-                style="height: 180px; object-fit: cover"
-              />
-            </template>
-            <a-card-meta :title="picture.name">
-              <template #description>
-                <a-flex>
-                  <a-tag color="green">{{ picture.category || '默认' }}</a-tag>
-                  <a-tag v-for="(index, item) in picture.tags" :key="index">
-                    {{ item }}
-                  </a-tag>
-                </a-flex>
-              </template>
-            </a-card-meta>
-          </a-card>
-        </a-list-item>
-      </template>
-    </a-list>
+    <PictureList :data-list="dataList" :loading="loading"></PictureList>
+    <!--    分页-->
+    <a-pagination
+      style="text-align: center"
+      v-model:current="searchParam.current"
+      v-model:page-size="searchParam.pageSize"
+      :total="total"
+      @change="onPageChange"
+    />
   </div>
 </template>
 
@@ -69,8 +48,8 @@ import {
   listPictureVoByPageCacheMultiUsingPost,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import PictureList from '@/components/PictureList.vue'
+
 const dataList = ref<API.PictureVO[]>([])
 const total = ref(0)
 const loading = ref(true)
@@ -79,20 +58,11 @@ const searchParam = reactive<API.PictureQueryRequest>({
   pageSize: 12,
 })
 
-const pagination = computed(() => {
-  return {
-    current: searchParam.current,
-    pageSize: searchParam.pageSize,
-    total: total.value,
-    showSizeChanger: true,
-    showQuickJumper: true,
-    onChange: (page: number, pageSize: number) => {
-      searchParam.current = page
-      searchParam.pageSize = pageSize
-      fetchData()
-    },
-  }
-})
+const onPageChange = (page: number, pageSize: number) => {
+  searchParam.current = page
+  searchParam.pageSize = pageSize
+  fetchData()
+}
 
 const fetchData = async () => {
   loading.value = true
@@ -140,12 +110,6 @@ const getCategoryAndTagOptions = async () => {
   } else {
     message.error('获取标签分类列表失败！' + res.data.message)
   }
-}
-
-const doClickPicture = (picture: API.PictureVO) => {
-  router.push({
-    path: `/picture/${picture.id}`,
-  })
 }
 
 onMounted(() => {

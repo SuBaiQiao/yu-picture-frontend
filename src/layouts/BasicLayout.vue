@@ -4,9 +4,12 @@
       <a-layout-header class="header">
         <GlobalHeader></GlobalHeader>
       </a-layout-header>
-      <a-layout-content class="content">
-        <RouterView />
-      </a-layout-content>
+      <a-layout>
+        <GlobalSider class="sider" />
+        <a-layout-content class="content">
+          <RouterView />
+        </a-layout-content>
+      </a-layout>
       <a-layout-footer class="footer">
         <a href="/" target="_blank">云图库 By SuBaiQiao ©2025 Created by Ant Vue</a>
       </a-layout-footer>
@@ -16,6 +19,7 @@
 
 <script setup lang="ts">
 import GlobalHeader from '@/components/GlobalHeader.vue'
+import GlobalSider from '@/components/GlobalSider.vue'
 </script>
 
 <style scoped>
@@ -23,12 +27,22 @@ import GlobalHeader from '@/components/GlobalHeader.vue'
   padding-inline: 20px;
   background: #ffffff;
   color: unset;
-  margin-bottom: 16px;
+  margin-bottom: 1px;
+}
+
+#basicLayout .sider {
+  background: #ffffff;
+  border-right: 0.5px solid #eee;
+}
+
+#basicLayout :deep(.ant-menu-root) {
+  border-bottom: none !important;
+  border-inline-end: none !important;
 }
 
 #basicLayout .content {
-  padding: 20px;
-  background: linear-gradient(to right, #efefef, #ffffff);
+  padding: 28px;
+  background: linear-gradient(to right, #fefefe, #ffffff);
   margin-bottom: 28px;
 }
 

@@ -2,14 +2,25 @@
   <div id="AddPicturePage">
     <!--    标题-->
     <h2 style="margin-bottom: 16px">{{ route.query?.id ? '修改' : '创建' }}图片</h2>
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+    </a-typography-paragraph>
     <a-tabs v-model:active-key="uploadType">
       <a-tab-pane key="file" tab="文件上传">
         <!--    图片上传-->
-        <PictureUpload :on-success="onSuccess" :picture="picture"></PictureUpload>
+        <PictureUpload
+          :on-success="onSuccess"
+          :spaceId="spaceId"
+          :picture="picture"
+        ></PictureUpload>
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL上传">
         <!--    URL 图片上传-->
-        <UrlPictureUpload :on-success="onSuccess" :picture="picture"></UrlPictureUpload>
+        <UrlPictureUpload
+          :on-success="onSuccess"
+          :spaceId="spaceId"
+          :picture="picture"
+        ></UrlPictureUpload>
       </a-tab-pane>
     </a-tabs>
     <!--    图片信息表单-->
@@ -61,7 +72,7 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   editPictureUsingPost,
@@ -82,7 +93,9 @@ const pictureForm = reactive<API.PictureEditRequest>({
   url: '',
 })
 const uploadType = ref<'file' | 'url'>('file')
-
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
 /**
  * 图片上传成功回调
  * @param newPicture 图片上传成功信息返回
@@ -99,6 +112,7 @@ const handleSubmit = async (values: API.PictureEditRequest) => {
   }
   const res = await editPictureUsingPost({
     id: pictureId,
+    spaceId: spaceId.value,
     ...values,
   })
   if (res.data.code === 0 && res.data.data) {

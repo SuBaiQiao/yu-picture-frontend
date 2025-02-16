@@ -29,6 +29,9 @@
               </a-space>
               <template #overlay>
                 <a-menu>
+                  <a-menu-item>
+                    <router-link to="/my_space"> <UserOutlined /> 我的空间 </router-link>
+                  </a-menu-item>
                   <a-menu-item @click="doLogout"> <LoginOutlined /> 退出登录 </a-menu-item>
                 </a-menu>
               </template>
@@ -44,7 +47,7 @@
 </template>
 <script lang="ts" setup>
 import { h, ref, onBeforeMount, computed } from 'vue'
-import { HomeOutlined, LoginOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
@@ -67,6 +70,11 @@ const originItems = ref<MenuProps['items']>([
     key: '/admin/pictureManage',
     label: '图片管理',
     title: '图片管理',
+  },
+  {
+    key: '/admin/spaceManage',
+    label: '空间管理',
+    title: '空间管理',
   },
   {
     key: '/add_picture',
