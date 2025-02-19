@@ -19,6 +19,9 @@
       </a-space>
     </a-flex>
     <div style="margin-bottom: 16px"></div>
+    <!--    搜索表单-->
+    <PictureSearchForm :on-search="onSearch"></PictureSearchForm>
+    <div style="margin-bottom: 16px"></div>
     <!--    图片列表-->
     <PictureList
       :data-list="dataList"
@@ -48,6 +51,7 @@ import {
 } from '@/api/pictureController.ts'
 import { formatSize } from '@/utils'
 import PictureList from '@/components/PictureList.vue'
+import PictureSearchForm from '@/components/PictureSearchForm.vue'
 const router = useRouter()
 interface Props {
   id: string | number
@@ -69,14 +73,16 @@ const fetchSpaceDetail = async () => {
 const dataList = ref<API.PictureVO[]>([])
 const total = ref(0)
 const loading = ref(true)
-const searchParam = reactive<API.PictureQueryRequest>({
+const searchParam = ref<API.PictureQueryRequest>({
   current: 1,
   pageSize: 12,
+  sortField: 'createTime',
+  sortOrder: 'descend',
 })
 
 const onPageChange = (page: number, pageSize: number) => {
-  searchParam.current = page
-  searchParam.pageSize = pageSize
+  searchParam.value.current = page
+  searchParam.value.pageSize = pageSize
   fetchData()
 }
 
@@ -84,7 +90,7 @@ const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
   const params = {
-    ...searchParam,
+    ...searchParam.value,
     spaceId: props.id,
   }
   const res = await listPictureVoByPageUsingPost(params)
@@ -97,13 +103,17 @@ const fetchData = async () => {
   loading.value = false
 }
 
-const doSearch = () => {
-  searchParam.current = 1
+const onSearch = (newSearchParam: API.PictureQueryRequest) => {
+  searchParam.value = {
+    ...searchParam.value,
+    ...newSearchParam,
+    current: 1,
+  }
   fetchData()
 }
 
 onMounted(() => {
-  doSearch()
+  fetchData()
   fetchSpaceDetail()
 })
 </script>
