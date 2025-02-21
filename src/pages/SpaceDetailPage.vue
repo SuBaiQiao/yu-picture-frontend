@@ -7,6 +7,7 @@
         <a-button type="primary" :href="`/add_picture?spaceId=${props.id}`" target="_blank"
           >+ 创建图片</a-button
         >
+        <a-button :icon="h(EditOutlined)" type="primary" @click="doBathcEdit">批量编辑</a-button>
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
@@ -41,14 +42,19 @@
       :total="total"
       @change="onPageChange"
     />
+    <BatchEditPictureModal
+      ref="BatchEditPictureModalRef"
+      :picture-list="dataList"
+      :on-success="onBatchEditPictureSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, defineProps, reactive } from 'vue'
+import { onMounted, ref, defineProps, h } from 'vue'
 import { getSpaceVoByIdUsingPost } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
+import { EditOutlined } from '@ant-design/icons-vue'
 import {
   listPictureVoByPageCacheMultiUsingPost,
   listPictureVoByPageUsingPost,
@@ -59,8 +65,8 @@ import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
+import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
 
-const router = useRouter()
 interface Props {
   id: string | number
 }
@@ -133,6 +139,16 @@ const onSearch = (newSearchParam: API.PictureQueryRequest) => {
     current: 1,
   }
   fetchData()
+}
+
+const BatchEditPictureModalRef = ref()
+const onBatchEditPictureSuccess = () => {
+  fetchData()
+}
+const doBathcEdit = () => {
+  if (BatchEditPictureModalRef.value) {
+    BatchEditPictureModalRef.value.showModal()
+  }
 }
 
 onMounted(() => {
