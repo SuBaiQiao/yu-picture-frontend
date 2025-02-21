@@ -38,7 +38,10 @@
             }}</a-descriptions-item>
           </a-descriptions>
           <a-space wrap>
-            <a-button type="primary" @click="onDownload">
+            <a-button ghost type="primary" @click="doShare()">
+              <template #icon> <ShareAltOutlined /> </template>分享</a-button
+            >
+            <a-button ghost type="primary" @click="onDownload">
               <template #icon> <DownloadOutlined /> </template>免费下载</a-button
             >
             <a-button
@@ -56,6 +59,7 @@
         </a-card>
       </a-col>
     </a-row>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 
@@ -63,10 +67,16 @@
 import { onMounted, ref, defineProps, h, computed } from 'vue'
 import { deletePictureUsingPost, getPictureVoByIdUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons-vue'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
 import { formatSize, downloadImage } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import ShareModal from '@/components/ShareModal.vue'
 const router = useRouter()
 interface Props {
   id: string | number
@@ -81,7 +91,7 @@ const canEdit = computed(() => {
     return false
   }
   return (
-    loginUserStore.loginUser.id === picture.user?.id ||
+    loginUserStore.loginUser.id === picture.value.user?.id ||
     loginUserStore.loginUser.userRole === 'admin'
   )
 })
@@ -122,6 +132,15 @@ const doDelete = async (id: string) => {
     await fetchData()
   } else {
     message.error('删除失败！' + res.data.message)
+  }
+}
+
+const shareModalRef = ref()
+const shareLink = ref<string>('')
+const doShare = () => {
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.showModal()
   }
 }
 

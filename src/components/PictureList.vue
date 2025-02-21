@@ -27,28 +27,31 @@
               </template>
             </a-card-meta>
             <template #actions>
-              <a-space @click="(e: any) => doSearch(picture, e)">
-                <SearchOutlined key="search" />搜索
-              </a-space>
-              <a-space v-if="showOp" @click="(e: any) => doEdit(picture, e)">
-                <EditOutlined key="edit" />编辑
-              </a-space>
-              <a-space v-if="showOp" @click="(e: any) => doDelete(picture, e)">
-                <DeleteOutlined key="edit" />删除
-              </a-space>
+              <ShareAltOutlined key="share" @click="(e: any) => doShare(picture, e)" />
+              <SearchOutlined key="search" @click="(e: any) => doSearch(picture, e)" />
+              <EditOutlined key="edit" v-if="showOp" @click="(e: any) => doEdit(picture, e)" />
+              <DeleteOutlined key="edit" v-if="showOp" @click="(e: any) => doDelete(picture, e)" />
             </template>
           </a-card>
         </a-list-item>
       </template>
     </a-list>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
+import ShareModal from '@/components/ShareModal.vue'
+import { ref } from 'vue'
 const router = useRouter()
 
 interface Props {
@@ -99,6 +102,17 @@ const doDelete = async (picture: API.PictureVO, e: any) => {
     props.onReload?.()
   } else {
     message.error('删除失败！' + res.data.message)
+  }
+}
+
+const shareModalRef = ref()
+const shareLink = ref<string>('')
+const doShare = (picture: API.PictureVO, e: any) => {
+  // 阻止冒泡
+  e.stopPropagation()
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.showModal()
   }
 }
 </script>
