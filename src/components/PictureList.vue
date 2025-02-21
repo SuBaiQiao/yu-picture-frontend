@@ -26,11 +26,14 @@
                 </a-flex>
               </template>
             </a-card-meta>
-            <template #actions v-if="showOp">
-              <a-space @click="(e) => doEdit(picture, e)">
+            <template #actions>
+              <a-space @click="(e: any) => doSearch(picture, e)">
+                <SearchOutlined key="search" />搜索
+              </a-space>
+              <a-space v-if="showOp" @click="(e: any) => doEdit(picture, e)">
                 <EditOutlined key="edit" />编辑
               </a-space>
-              <a-space @click="(e) => doDelete(picture, e)">
+              <a-space v-if="showOp" @click="(e: any) => doDelete(picture, e)">
                 <DeleteOutlined key="edit" />删除
               </a-space>
             </template>
@@ -42,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
@@ -66,7 +69,7 @@ const doClickPicture = (picture: API.PictureVO) => {
   })
 }
 
-const doEdit = (picture, e) => {
+const doEdit = (picture: API.PictureVO, e: any) => {
   // 阻止冒泡
   e.stopPropagation()
   // 跳转时携带spaceId
@@ -79,7 +82,13 @@ const doEdit = (picture, e) => {
   })
 }
 
-const doDelete = async (picture, e) => {
+const doSearch = (picture: API.PictureVO, e: any) => {
+  // 阻止冒泡
+  e.stopPropagation()
+  window.open('/search_picture?pictureId=' + picture.id)
+}
+
+const doDelete = async (picture: API.PictureVO, e: any) => {
   // 阻止冒泡
   e.stopPropagation()
   const res = await deletePictureUsingPost({
