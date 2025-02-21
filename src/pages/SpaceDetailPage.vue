@@ -22,6 +22,10 @@
     <!--    搜索表单-->
     <PictureSearchForm :on-search="onSearch"></PictureSearchForm>
     <div style="margin-bottom: 16px"></div>
+    <a-form-item label="按颜色搜索">
+      <ColorPicker format="hex" @pureColorChange="onColorChange"></ColorPicker>
+    </a-form-item>
+    <div style="margin-bottom: 16px"></div>
     <!--    图片列表-->
     <PictureList
       :data-list="dataList"
@@ -48,10 +52,14 @@ import { useRouter } from 'vue-router'
 import {
   listPictureVoByPageCacheMultiUsingPost,
   listPictureVoByPageUsingPost,
+  searchPictureByColorUsingPost,
 } from '@/api/pictureController.ts'
 import { formatSize } from '@/utils'
 import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import { ColorPicker } from 'vue3-colorpicker'
+import 'vue3-colorpicker/style.css'
+
 const router = useRouter()
 interface Props {
   id: string | number
@@ -97,6 +105,21 @@ const fetchData = async () => {
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
+  } else {
+    message.error('获取数据失败！' + res.data.message)
+  }
+  loading.value = false
+}
+
+const onColorChange = async (color: string) => {
+  loading.value = true
+  const res = await searchPictureByColorUsingPost({
+    spaceId: props.id,
+    picColor: color,
+  })
+  if (res.data.code === 0 && res.data.data) {
+    dataList.value = res.data.data ?? []
+    total.value = res.data.data.length ?? 0
   } else {
     message.error('获取数据失败！' + res.data.message)
   }
