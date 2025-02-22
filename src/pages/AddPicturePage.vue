@@ -25,7 +25,14 @@
     </a-tabs>
     <!--    图片编辑-->
     <div v-if="picture && picture.url" class="edit-bar">
-      <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
+      <a-space>
+        <a-button type="primary" ghost :icon="h(EditOutlined)" @click="doEditPicture"
+          >编辑图片</a-button
+        >
+        <a-button type="primary" :icon="h(FullscreenOutlined)" @click="doAiOutPainting"
+          >Ai 扩图</a-button
+        >
+      </a-space>
     </div>
     <ImageCropper
       ref="imageCropperRef"
@@ -33,6 +40,11 @@
       :space-id="spaceId"
       :picture="picture"
       :on-success="onCropperSuccess"
+    />
+    <ImageOutPainting
+      ref="imageOutPaintingRef"
+      :picture="picture"
+      :on-success="onOutPaintingSuccess"
     />
     <!--    图片信息表单-->
     <a-form
@@ -90,10 +102,12 @@ import {
   getPictureVoByIdUsingPost,
   listPictureTagCategoryUsingGet,
 } from '@/api/pictureController.ts'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import ImageCropper from '@/components/ImageCropper.vue'
+import ImageOutPainting from '@/components/ImageOutPainting.vue'
+
 const router = useRouter()
 const route = useRoute()
 const picture = ref<API.PictureVO>({})
@@ -182,8 +196,19 @@ const getOldPicture = async () => {
 }
 
 const imageCropperRef = ref()
+const imageOutPaintingRef = ref()
 const doEditPicture = () => {
   imageCropperRef.value?.showModal()
+}
+
+const doAiOutPainting = () => {
+  imageOutPaintingRef.value?.showModal()
+}
+
+const onOutPaintingSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+  pictureForm.name = newPicture.name
+  imageOutPaintingRef.value?.closeModal()
 }
 
 const onCropperSuccess = (newPicture: API.PictureVO) => {

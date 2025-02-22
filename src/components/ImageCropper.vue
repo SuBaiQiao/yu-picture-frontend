@@ -6,7 +6,6 @@
     :footer="false"
     @cancel="closeModal"
   >
-    {{ imageUrl }}
     <vue-cropper
       ref="cropperRef"
       :img="imageUrl"
