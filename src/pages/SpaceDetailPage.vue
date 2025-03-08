@@ -8,6 +8,14 @@
           >+ 创建图片</a-button
         >
         <a-button :icon="h(EditOutlined)" type="primary" @click="doBathcEdit">批量编辑</a-button>
+        <a-button
+          :icon="h(BarChartOutlined)"
+          type="primary"
+          ghost
+          :href="`/space_analyze?spaceId=${props.id}`"
+          target="_blank"
+          >空间分析</a-button
+        >
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
@@ -54,7 +62,7 @@
 import { onMounted, ref, defineProps, h } from 'vue'
 import { getSpaceVoByIdUsingPost } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, BarChartOutlined } from '@ant-design/icons-vue'
 import {
   listPictureVoByPageCacheMultiUsingPost,
   listPictureVoByPageUsingPost,
