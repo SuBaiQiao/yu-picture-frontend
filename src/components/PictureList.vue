@@ -29,8 +29,16 @@
             <template #actions>
               <ShareAltOutlined key="share" @click="(e: any) => doShare(picture, e)" />
               <SearchOutlined key="search" @click="(e: any) => doSearch(picture, e)" />
-              <EditOutlined key="edit" v-if="showOp" @click="(e: any) => doEdit(picture, e)" />
-              <DeleteOutlined key="edit" v-if="showOp" @click="(e: any) => doDelete(picture, e)" />
+              <EditOutlined
+                key="edit"
+                v-if="canEdit && showOp"
+                @click="(e: any) => doEdit(picture, e)"
+              />
+              <DeleteOutlined
+                key="edit"
+                v-if="canDelete && showOp"
+                @click="(e: any) => doDelete(picture, e)"
+              />
             </template>
           </a-card>
         </a-list-item>
@@ -59,11 +67,15 @@ interface Props {
   loading?: boolean
   showOp?: boolean
   onReload: () => void
+  canEdit?: boolean
+  canDelete?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   dataList: () => [],
   loading: false,
   showOp: false,
+  canEdit: false,
+  canDelete: false,
 })
 
 const doClickPicture = (picture: API.PictureVO) => {

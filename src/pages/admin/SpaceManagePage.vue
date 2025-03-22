@@ -38,6 +38,15 @@
           style="min-width: 180px"
         ></a-select>
       </a-form-item>
+      <a-form-item label="空间类别" name="spaceType">
+        <a-select
+          v-model:value="searchParam.spaceType"
+          placeholder="请选择空间类别"
+          :options="SPACE_TYPE_OPTIONS"
+          allow-clear
+          style="min-width: 180px"
+        ></a-select>
+      </a-form-item>
       <a-form-item label="用户ID">
         <a-input v-model:value="searchParam.userId" placeholder="请输入用户ID" allow-clear />
       </a-form-item>
@@ -54,6 +63,9 @@
       @change="doTableChange"
     >
       <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'spaceType'">
+          {{ SPACE_TYPE_MAP[record.spaceType] }}
+        </template>
         <template v-if="column.dataIndex === 'spaceLevel'">
           {{ SPACE_LEVEL_MAP[record.spaceLevel] }}
         </template>
@@ -91,12 +103,18 @@ import { computed, h, onMounted, reactive, ref } from 'vue'
 import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS } from '@/constant/space.ts'
+import {
+  SPACE_LEVEL_MAP,
+  SPACE_LEVEL_OPTIONS,
+  SPACE_TYPE_MAP,
+  SPACE_TYPE_OPTIONS,
+} from '@/constant/space.ts'
 import { formatSize } from '../../utils'
 import { BarChartOutlined } from '@ant-design/icons-vue'
 const columns = [
   { title: 'id', dataIndex: 'id', width: 80 },
   { title: '空间名称', dataIndex: 'spaceName' },
+  { title: '空间类别', dataIndex: 'spaceType' },
   { title: '空间级别', dataIndex: 'spaceLevel' },
   { title: '使用情况', dataIndex: 'spaceUseInfo' },
   { title: '用户ID', dataIndex: 'userId', width: 80 },

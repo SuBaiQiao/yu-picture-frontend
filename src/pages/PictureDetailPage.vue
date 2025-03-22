@@ -52,7 +52,11 @@
               target="_blank"
               >编辑</a-button
             >
-            <a-button v-if="canEdit" :icon="h(DeleteOutlined)" danger @click="doDelete(picture.id)"
+            <a-button
+              v-if="canDelete"
+              :icon="h(DeleteOutlined)"
+              danger
+              @click="doDelete(picture.id)"
               >删除</a-button
             >
           </a-space>
@@ -77,6 +81,7 @@ import { useRouter } from 'vue-router'
 import { formatSize, downloadImage } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import ShareModal from '@/components/ShareModal.vue'
+import { SPACE_PERMISSION_ENUM } from '@/constant/space.ts'
 const router = useRouter()
 interface Props {
   id: string | number
@@ -86,15 +91,25 @@ const picture = ref<API.PictureVO>({})
 
 const loginUserStore = useLoginUserStore()
 
-const canEdit = computed(() => {
-  if (!loginUserStore.loginUser.id) {
-    return false
-  }
-  return (
-    loginUserStore.loginUser.id === picture.value.user?.id ||
-    loginUserStore.loginUser.userRole === 'admin'
-  )
-})
+const createPermissionChecker = (permission: string) => {
+  return computed(() => {
+    return (space.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
+
+// const canEdit = computed(() => {
+//   if (!loginUserStore.loginUser.id) {
+//     return false
+//   }
+//   return (
+//     loginUserStore.loginUser.id === picture.value.user?.id ||
+//     loginUserStore.loginUser.userRole === 'admin'
+//   )
+// })
 const fetchPictureDetail = async () => {
   const res = await getPictureVoByIdUsingPost({
     id: props.id,
