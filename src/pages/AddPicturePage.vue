@@ -38,6 +38,7 @@
       ref="imageCropperRef"
       :image-url="picture.url"
       :space-id="spaceId"
+      :space="space"
       :picture="picture"
       :on-success="onCropperSuccess"
     />
@@ -95,7 +96,7 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { computed, onMounted, reactive, ref, h } from 'vue'
+import { computed, onMounted, reactive, ref, h, watchEffect } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   editPictureUsingPost,
@@ -107,6 +108,7 @@ import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import ImageCropper from '@/components/ImageCropper.vue'
 import ImageOutPainting from '@/components/ImageOutPainting.vue'
+import { getSpaceVoByIdUsingPost } from '@/api/spaceController.ts'
 
 const router = useRouter()
 const route = useRoute()
@@ -216,6 +218,23 @@ const onCropperSuccess = (newPicture: API.PictureVO) => {
   pictureForm.name = newPicture.name
   imageCropperRef.value?.closeModal()
 }
+
+const space = ref<API.SpaceVO>()
+
+const fetchSpace = async () => {
+  if (spaceId.value) {
+    const res = await getSpaceVoByIdUsingPost({
+      id: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      space.value = res.data.data
+    }
+  }
+}
+
+watchEffect(() => {
+  fetchSpace()
+})
 
 onMounted(() => {
   getCategoryAndTagOptions()
