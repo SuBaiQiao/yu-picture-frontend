@@ -93,7 +93,7 @@ const loginUserStore = useLoginUserStore()
 
 const createPermissionChecker = (permission: string) => {
   return computed(() => {
-    return (space.value.permissionList ?? []).includes(permission)
+    return (picture.value.permissionList ?? []).includes(permission)
   })
 }
 
@@ -144,7 +144,6 @@ const doDelete = async (id: string) => {
   })
   if (res.data.code === 0) {
     message.success('删除成功！')
-    await fetchData()
   } else {
     message.error('删除失败！' + res.data.message)
   }
