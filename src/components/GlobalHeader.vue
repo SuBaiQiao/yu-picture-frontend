@@ -32,6 +32,9 @@
                   <a-menu-item>
                     <router-link to="/my_space"> <UserOutlined /> 我的空间 </router-link>
                   </a-menu-item>
+                  <a-menu-item>
+                    <router-link to="/user_exchange_vip"> <CrownOutlined /> 兑换会员 </router-link>
+                  </a-menu-item>
                   <a-menu-item @click="doLogout"> <LoginOutlined /> 退出登录 </a-menu-item>
                 </a-menu>
               </template>
@@ -47,7 +50,7 @@
 </template>
 <script lang="ts" setup>
 import { h, ref, onBeforeMount, computed } from 'vue'
-import { HomeOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, LoginOutlined, UserOutlined, CrownOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
